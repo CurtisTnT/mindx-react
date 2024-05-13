@@ -1,0 +1,73 @@
+.pokemonsCtn {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  place-items: "center";
+}
+
+.card {
+  width: 250px;
+  height: 300px;
+}
+
+.imgCtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f2f2f2;
+  padding: 20px 10px;
+  border-radius: 10px;
+}
+
+.idText {
+  margin: 0px;
+  text-align: start;
+  color: grey;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.name {
+  margin: 10px 0px;
+  text-align: start;
+}
+
+.btnCtn {
+  display: flex;
+  gap: 5px;
+}
+
+.type {
+  padding: 2px 20px;
+  border-radius: 4px;
+  font-weight: 500;
+
+  &.grass {
+    background-color: #9bcc50;
+  }
+
+  &.poison {
+    background-color: #b97fc8;
+    color: #fff;
+  }
+
+  &.fire {
+    background-color: #fd7d25;
+    color: #fff;
+  }
+
+  &.flying {
+    /* background-color: "#fd7d25";
+    color: "#fff"; */
+    background-image: linear-gradient(#3cc7ef , #bdb9b8);
+  }
+
+  &.water {
+    background-color: #4492c3;
+    color: #fff;
+  }
+
+  &.bug {
+    background-color: #709d3f;
+    color: #fff;
+  }
+}
