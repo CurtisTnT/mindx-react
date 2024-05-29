@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 
 import "./App.css";
 import png001 from "/src/assets/images/001.png";
@@ -17,81 +17,9 @@ import PokemonCard from "./components/PokemonCard";
 import Modal from "./components/Modal";
 import FormInput from "./components/Input";
 import SearchBar from "./components/SearchBar";
-
-const ITEMS = [
-  {
-    id: "#0001",
-    image: png001,
-    name: "Bulbasaur",
-    types: ["grass", "poison"],
-  },
-  {
-    id: "#0002",
-    image: png002,
-    name: "Bulbasaur",
-    types: ["grass", "poison"],
-  },
-  {
-    id: "#0003",
-    image: png003,
-    name: "Venusaur",
-    types: ["grass", "poison"],
-  },
-  {
-    id: "#0004",
-    image: png004,
-    name: "Charmander",
-    types: ["fire"],
-  },
-  {
-    id: "#0005",
-    image: png005,
-    name: "Charmeleon",
-    types: ["fire"],
-  },
-  {
-    id: "#0006",
-    image: png006,
-    name: "Charizard",
-    types: ["fire", "flying"],
-  },
-  {
-    id: "#0007",
-    image: png007,
-    name: "Squirtle",
-    types: ["water"],
-  },
-  {
-    id: "#0008",
-    image: png008,
-    name: "Wartortle",
-    types: ["water"],
-  },
-  {
-    id: "#0009",
-    image: png009,
-    name: "Blatoise",
-    types: ["water"],
-  },
-  {
-    id: "#0010",
-    image: png010,
-    name: "Caterpie",
-    types: ["bug"],
-  },
-  {
-    id: "#0011",
-    image: png011,
-    name: "Metapod",
-    types: ["bug"],
-  },
-  {
-    id: "#0012",
-    image: png012,
-    name: "Butterfree",
-    types: ["bug", "flying"],
-  },
-];
+import Loading from "./components/Loading";
+import { fetchAPI } from "./lib/fetchAPI.js";
+import { StoreContext } from "./store/index.js";
 
 const TYPE_ITEMS = [
   {
@@ -118,66 +46,121 @@ const TYPE_ITEMS = [
     value: "bug",
     label: "Bug",
   },
+  {
+    value: "normal",
+    label: "Normal",
+  },
 ];
 
 function App() {
-  const [initalPokemons, setInitialPokemons] = useState(ITEMS);
+  // const [records, setRecords] = useState({
+  //   next: "",
+  //   previous: "",
+  //   results: [],
+  // });
+  const { records, setRecords } = useContext(StoreContext);
 
-  const [showModal, setShowModal] = useState(false);
-  const [selectedPokemon, setSelectedPokemon] = useState({
-    id: "",
-    image: "",
-    name: "",
-    types: [],
-  });
+  const [pokemons, setPokemons] = useState([]);
+  const [loading, setLoading] = useState(true);
+  // const [showModal, setShowModal] = useState(false);
+  // const [selectedPokemon, setSelectedPokemon] = useState({
+  //   image: "",
+  //   name: "",
+  //   types: [],
+  //   url: "",
+  // });
 
-  const handleOpenModal = () => {
-    setShowModal(true);
-    document.body.style.overflow = "hidden";
-  };
+  // const handleOpenModal = () => {
+  //   setShowModal(true);
+  //   document.body.style.overflow = "hidden";
+  // };
 
-  const handleCloseModal = () => {
-    setShowModal(false);
-    document.body.style.overflow = "auto";
-  };
+  // const handleCloseModal = () => {
+  //   setShowModal(false);
+  //   document.body.style.overflow = "auto";
+  // };
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-
-    setInitialPokemons((prev) =>
-      prev.map((pokemon) =>
-        pokemon.id === selectedPokemon.id ? selectedPokemon : pokemon
-      )
-    );
-    handleCloseModal();
-  };
+  // const handleSubmit = (event) => {
+  //   event.preventDefault();
+  //   setPokemons(
+  //     pokemons.map((pokemon) =>
+  //       pokemon.url === selectedPokemon.url ? selectedPokemon : pokemon
+  //     )
+  //   );
+  //   handleCloseModal();
+  // };
 
   const handleFilterPokemon = (search) => {
-    setInitialPokemons(
-      ITEMS.filter(({ name }) =>
+    setPokemons(
+      records.results.filter(({ name }) =>
         name.toLowerCase().includes(search.trim().toLowerCase())
       )
     );
   };
+
+  const handlePagination = async (url) => {
+    setLoading(true);
+    (async () => {
+      const res = await fetchAPI({ url });
+
+      setRecords(res);
+      setPokemons(res.results);
+      setLoading(false);
+    })();
+  };
+
+  useEffect(() => {
+    (async () => {
+      const res = await fetchAPI({
+        url: "https://pokeapi.co/api/v2/pokemon/",
+      });
+      const { results } = res;
+
+      setRecords(res);
+      setPokemons(results);
+      setTimeout(() => {
+        setLoading(false);
+      }, 1000);
+    })();
+  }, []);
 
   return (
     <div className="app-container">
       <SearchBar onFilterPokemons={handleFilterPokemon} />
 
       <div className="pokemonsCtn">
-        {initalPokemons.map((pokemon) => (
+        {pokemons.map((pokemon, index) => (
           <PokemonCard
-            key={pokemon.id}
-            pokemon={pokemon}
-            onSelectPokemon={() => {
-              setSelectedPokemon(pokemon);
-              handleOpenModal();
-            }}
+            key={pokemon.name + index}
+            url={pokemon.url}
+            // onSelectPokemon={(pokemon) => {
+            //   setSelectedPokemon(pokemon);
+            //   handleOpenModal();
+            // }}
           />
         ))}
       </div>
 
-      {showModal && (
+      <div className="buttons-container">
+        <button
+          type="button"
+          className="button"
+          disabled={!records.previous}
+          onClick={() => handlePagination(records.previous)}
+        >
+          Previous
+        </button>
+        <button
+          type="button"
+          className="button"
+          disabled={!records.next}
+          onClick={() => handlePagination(records.next)}
+        >
+          Next
+        </button>
+      </div>
+
+      {/* {showModal && (
         <Modal onClose={handleCloseModal}>
           <div className="modal-imgCtn">
             <img
@@ -240,7 +223,8 @@ function App() {
             </div>
           </form>
         </Modal>
-      )}
+      )} */}
+      {loading && <Loading />}
     </div>
   );
 }

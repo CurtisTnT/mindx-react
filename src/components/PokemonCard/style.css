@@ -62,8 +62,6 @@
   }
 
   &.flying {
-    /* background-color: "#fd7d25";
-    color: "#fff"; */
     background-image: linear-gradient(#3cc7ef, #bdb9b8);
   }
 
@@ -75,5 +73,9 @@
   &.bug {
     background-color: #709d3f;
     color: #fff;
+  }
+
+  &.normal {
+    background-color: #e1dd0f;
   }
 }

@@ -39,4 +39,27 @@
 
 .app-container {
   padding: 30px;
+
+  .buttons-container {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 50px;
+
+    .button {
+      width: 100px;
+      background-color: rgb(28, 176, 176);
+      color: #fff;
+      border: none;
+
+      &:hover {
+        background-color: rgb(23, 141, 141);
+      }
+
+      &:disabled {
+        background-color: rgb(17, 102, 102);
+        cursor: not-allowed;
+      }
+    }
+  }
 }

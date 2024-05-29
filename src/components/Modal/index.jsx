@@ -1,4 +1,4 @@
-import "./Modal.css";
+import "./style.css";
 
 export default function Modal(props) {
   const { onClose } = props;
