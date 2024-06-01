@@ -1,231 +1,28 @@
-import { useContext, useEffect, useState } from "react";
+import { Route, Routes } from "react-router-dom";
 
 import "./App.css";
-import png001 from "/src/assets/images/001.png";
-import png002 from "/src/assets/images/002.png";
-import png003 from "/src/assets/images/003-Mega.png";
-import png004 from "/src/assets/images/004.png";
-import png005 from "/src/assets/images/005.png";
-import png006 from "/src/assets/images/006-Mega-Y.png";
-import png007 from "/src/assets/images/007.png";
-import png008 from "/src/assets/images/008.png";
-import png009 from "/src/assets/images/009-Mega.png";
-import png010 from "/src/assets/images/010.png";
-import png011 from "/src/assets/images/011.png";
-import png012 from "/src/assets/images/012.png";
-import PokemonCard from "./components/PokemonCard";
-import Modal from "./components/Modal";
-import FormInput from "./components/Input";
-import SearchBar from "./components/SearchBar";
-import Loading from "./components/Loading";
-import { fetchAPI } from "./lib/fetchAPI.js";
-import { StoreContext } from "./store/index.js";
-
-const TYPE_ITEMS = [
-  {
-    value: "grass",
-    label: "Grass",
-  },
-  {
-    value: "poison",
-    label: "Poison",
-  },
-  {
-    value: "fire",
-    label: "Fire",
-  },
-  {
-    value: "flying",
-    label: "Flying",
-  },
-  {
-    value: "water",
-    label: "Water",
-  },
-  {
-    value: "bug",
-    label: "Bug",
-  },
-  {
-    value: "normal",
-    label: "Normal",
-  },
-];
+import Home from "./components/pages/Home/index.jsx";
+import Register from "./components/pages/Register/index.jsx";
+import Header from "./components/layouts/Header/index.jsx";
+import Profile from "./components/pages/Profile/index.jsx";
+import AboutMe from "./components/pages/Profile/AboutMe/index.jsx";
+import Settings from "./components/pages/Profile/Settings/index.jsx";
 
 function App() {
-  // const [records, setRecords] = useState({
-  //   next: "",
-  //   previous: "",
-  //   results: [],
-  // });
-  const { records, setRecords } = useContext(StoreContext);
-
-  const [pokemons, setPokemons] = useState([]);
-  const [loading, setLoading] = useState(true);
-  // const [showModal, setShowModal] = useState(false);
-  // const [selectedPokemon, setSelectedPokemon] = useState({
-  //   image: "",
-  //   name: "",
-  //   types: [],
-  //   url: "",
-  // });
-
-  // const handleOpenModal = () => {
-  //   setShowModal(true);
-  //   document.body.style.overflow = "hidden";
-  // };
-
-  // const handleCloseModal = () => {
-  //   setShowModal(false);
-  //   document.body.style.overflow = "auto";
-  // };
-
-  // const handleSubmit = (event) => {
-  //   event.preventDefault();
-  //   setPokemons(
-  //     pokemons.map((pokemon) =>
-  //       pokemon.url === selectedPokemon.url ? selectedPokemon : pokemon
-  //     )
-  //   );
-  //   handleCloseModal();
-  // };
-
-  const handleFilterPokemon = (search) => {
-    setPokemons(
-      records.results.filter(({ name }) =>
-        name.toLowerCase().includes(search.trim().toLowerCase())
-      )
-    );
-  };
-
-  const handlePagination = async (url) => {
-    setLoading(true);
-    (async () => {
-      const res = await fetchAPI({ url });
-
-      setRecords(res);
-      setPokemons(res.results);
-      setLoading(false);
-    })();
-  };
-
-  useEffect(() => {
-    (async () => {
-      const res = await fetchAPI({
-        url: "https://pokeapi.co/api/v2/pokemon/",
-      });
-      const { results } = res;
-
-      setRecords(res);
-      setPokemons(results);
-      setTimeout(() => {
-        setLoading(false);
-      }, 1000);
-    })();
-  }, []);
-
   return (
-    <div className="app-container">
-      <SearchBar onFilterPokemons={handleFilterPokemon} />
+    <main className="app-container">
+      <Header />
 
-      <div className="pokemonsCtn">
-        {pokemons.map((pokemon, index) => (
-          <PokemonCard
-            key={pokemon.name + index}
-            url={pokemon.url}
-            // onSelectPokemon={(pokemon) => {
-            //   setSelectedPokemon(pokemon);
-            //   handleOpenModal();
-            // }}
-          />
-        ))}
-      </div>
-
-      <div className="buttons-container">
-        <button
-          type="button"
-          className="button"
-          disabled={!records.previous}
-          onClick={() => handlePagination(records.previous)}
-        >
-          Previous
-        </button>
-        <button
-          type="button"
-          className="button"
-          disabled={!records.next}
-          onClick={() => handlePagination(records.next)}
-        >
-          Next
-        </button>
-      </div>
-
-      {/* {showModal && (
-        <Modal onClose={handleCloseModal}>
-          <div className="modal-imgCtn">
-            <img
-              src={selectedPokemon.image}
-              alt="image"
-              width={250}
-              height={250}
-            />
-          </div>
-
-          <form onSubmit={handleSubmit} className="modal-form">
-            <FormInput
-              label="ID"
-              value={selectedPokemon.id}
-              onValueChange={(id) =>
-                setSelectedPokemon((prev) => ({
-                  ...prev,
-                  id,
-                }))
-              }
-            />
-
-            <FormInput
-              label="Name"
-              value={selectedPokemon.name}
-              onValueChange={(name) =>
-                setSelectedPokemon((prev) => ({
-                  ...prev,
-                  name,
-                }))
-              }
-            />
-
-            <div className="modal-form-control">
-              <span>Types:</span>
-
-              <div className="modal-types-ctn">
-                {TYPE_ITEMS.map(({ value, label }, index) => (
-                  <div className="modal-check-inbox" key={index}>
-                    <input
-                      type="checkbox"
-                      checked={selectedPokemon.types.includes(value)}
-                      onChange={() =>
-                        setSelectedPokemon((prev) => ({
-                          ...prev,
-                          types: prev.types.includes(value)
-                            ? prev.types.filter((type) => type !== value)
-                            : [...prev.types, value],
-                        }))
-                      }
-                    />
-                    <label htmlFor="types">{label}</label>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="modal-submit-btn-ctn">
-              <button type="submit">Save</button>
-            </div>
-          </form>
-        </Modal>
-      )} */}
-      {loading && <Loading />}
-    </div>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/profile" element={<Profile />}>
+          <Route path="about-me" element={<AboutMe />} />
+          <Route path="settings" element={<Settings />} />
+        </Route>
+        <Route path="*" element={<h1>Page not found!</h1>} />
+      </Routes>
+    </main>
   );
 }
 
